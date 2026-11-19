@@ -1,0 +1,340 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>ХРАЗ — диалог</title>
+<link rel="stylesheet" href="katex/katex.min.css">
+<script src="katex/katex.min.js"></script>
+<script src="marked.min.js"></script>
+<style>
+  @font-face { font-family: "Russo One"; src: url("../fonts/RussoOne-Regular.ttf"); }
+  @font-face { font-family: "Oswald"; src: url("../fonts/Oswald.ttf"); }
+  @font-face { font-family: "JetBrains Mono"; src: url("../fonts/JetBrainsMono.ttf"); }
+  :root {
+    --bg: #0e0b0a; --panel: #17110f; --panel2: #1e1613; --line: #3a2a22;
+    --red: #d7262e; --red-dim: #7d1a1e; --brass: #c9a24a; --brass-dim: #6e5a2e;
+    --cream: #eadfc8; --muted: #8f8070;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--cream);
+    font: 15px/1.55 "Segoe UI", system-ui, sans-serif; }
+  body {
+    background:
+      radial-gradient(ellipse at 50% -20%, rgba(215,38,46,.10), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,.012) 0 1px, transparent 1px 3px),
+      var(--bg);
+  }
+  #log { padding: 18px 22px 30px; display: flex; flex-direction: column; gap: 14px; }
+  .msg { max-width: 88%; animation: in .18s ease-out; }
+  @keyframes in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .who { font: 11px/1 "Oswald", sans-serif; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 6px; display: flex; gap: 10px; align-items: center; }
+  .who time { letter-spacing: .05em; opacity: .7; }
+  .who .meta { font: 10px/1 "JetBrains Mono", monospace; letter-spacing: 0; text-transform: none; color: var(--muted);
+    opacity: .75; font-style: normal; }
+  .more { display: inline-block; margin: 6px 0 0 14px; font: 11px/1 "Oswald", sans-serif; letter-spacing: .2em;
+    color: var(--brass); text-decoration: none; border-bottom: 1px dashed var(--brass-dim); padding-bottom: 2px; }
+  .more:hover { color: #fff3dc; }
+  .user { align-self: flex-end; }
+  .user .who { justify-content: flex-end; color: var(--brass); }
+  .user .body { background: var(--panel2); border: 1px solid var(--brass-dim); border-radius: 2px 14px 2px 14px;
+    padding: 9px 14px; }
+  .bot .who { color: var(--red); }
+  .bot .who::before { content: ""; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--red) url("../img/khraz_avatar.png") center/cover no-repeat;
+    box-shadow: 0 0 0 1.5px var(--red), 0 0 10px rgba(215,38,46,.55); filter: saturate(.9); }
+  .bot .body { border-left: 2px solid var(--red-dim); padding: 2px 0 2px 14px; }
+  .sys .body { color: var(--muted); font-size: 13px; border-left: 2px solid var(--line); padding-left: 12px; }
+  .sys .who { display: none; }
+  .body p { margin: 0 0 .6em; } .body p:last-child { margin-bottom: 0; }
+  .body strong { color: #fff3dc; }
+  .body h1, .body h2, .body h3 { font: 16px "Oswald", sans-serif; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--brass); margin: .8em 0 .4em; }
+  .body ul, .body ol { margin: .2em 0 .6em; padding-left: 1.3em; }
+  .body li { margin: .15em 0; }
+  .body li::marker { color: var(--red); }
+  .body a { color: var(--brass); }
+  .body code { font: 13px "JetBrains Mono", monospace; background: #241b17; padding: 1px 5px; border-radius: 3px; }
+  .body pre { position: relative; background: #120d0b; border: 1px solid var(--line); border-radius: 4px;
+    padding: 12px 14px; overflow-x: auto; margin: .6em 0; }
+  .body pre code { background: none; padding: 0; font-size: 13px; line-height: 1.5; }
+  .copy { position: absolute; top: 6px; right: 6px; font: 10px "Oswald", sans-serif; letter-spacing: .15em;
+    background: var(--panel2); color: var(--muted); border: 1px solid var(--line); padding: 3px 8px; cursor: pointer; }
+  .copy:hover { color: var(--cream); border-color: var(--brass-dim); }
+  .body table { border-collapse: collapse; margin: .6em 0; }
+  .body td, .body th { border: 1px solid var(--line); padding: 4px 10px; }
+  .body th { color: var(--brass); font-weight: 600; }
+  .katex { font-size: 1.12em; color: #fff3dc; }
+  .katex-display { margin: .7em 0; padding: 8px 0; border-top: 1px dashed var(--line);
+    border-bottom: 1px dashed var(--line); overflow-x: auto; overflow-y: hidden; }
+  .cursor::after { content: "▌"; color: var(--red); animation: blink 1s steps(2) infinite; margin-left: 2px; }
+  @keyframes blink { 50% { opacity: 0; } }
+  .empty { margin: 18vh auto 0; text-align: center; color: var(--muted); }
+  .empty .big { font: 34px "Russo One", sans-serif; letter-spacing: .12em; color: var(--red);
+    text-shadow: 0 0 22px rgba(215,38,46,.35); }
+  .empty .sub { font: 12px "Oswald", sans-serif; letter-spacing: .35em; text-transform: uppercase; margin-top: 8px; }
+  .empty .hint { margin-top: 22px; font-size: 13px; }
+  .card { align-self: stretch; max-width: 100%; border: 1px solid var(--red-dim); background:
+    linear-gradient(180deg, rgba(215,38,46,.08), rgba(0,0,0,0)); padding: 12px 16px; position: relative; }
+  .card::before { content: "ТРЕБУЕТСЯ РЕШЕНИЕ"; position: absolute; top: -9px; left: 12px; padding: 0 8px;
+    background: var(--bg); font: 11px "Oswald", sans-serif; letter-spacing: .25em; color: var(--red); }
+  .card h4 { margin: 2px 0 8px; font: 18px "Russo One", sans-serif; letter-spacing: .06em; color: #fff3dc; }
+  .card .acts { display: flex; gap: 10px; margin-top: 12px; align-items: center; flex-wrap: wrap; }
+  .card a.btn { text-decoration: none; font: 13px "Oswald", sans-serif; letter-spacing: .2em; padding: 8px 18px;
+    border: 1px solid var(--line); color: var(--cream); background: var(--panel2); }
+  .card a.ok { background: var(--red); border-color: var(--red); color: #fff; }
+  .card a.btn:hover { filter: brightness(1.15); }
+  .card .note { font-size: 12px; color: var(--muted); }
+  .card .state { font: 13px "Oswald", sans-serif; letter-spacing: .2em; color: var(--brass); }
+  .card.done { border-color: var(--line); opacity: .85; }
+  :root { color-scheme: dark; scrollbar-width: thin; scrollbar-color: var(--line) transparent; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; background: transparent; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; border: 0; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--brass-dim); }
+  ::-webkit-scrollbar-button, ::-webkit-scrollbar-corner { display: none; width: 0; height: 0; background: transparent; }
+  /* ХРАЗ начал разговор сам */
+  .msg.alert { align-self: stretch; max-width: 100%; border: 1px solid var(--brass-dim); border-left: 3px solid var(--brass);
+    background: linear-gradient(90deg, rgba(201,162,74,.10), transparent 70%); padding: 8px 12px; }
+  .msg.alert .who { color: var(--brass); }
+  .msg.alert .who::before { content: "◉"; width: auto; height: auto; background: none; box-shadow: none;
+    color: var(--brass); animation: blink 1.2s 3; }
+  /* Оценка ответа */
+  .rate { display: inline-flex; gap: 6px; margin: 6px 0 0 14px; opacity: .35; transition: opacity .15s; }
+  .msg:hover .rate, .rate.voted { opacity: 1; }
+  .rate a { text-decoration: none; font-size: 13px; padding: 1px 6px; border: 1px solid var(--line); border-radius: 3px;
+    filter: grayscale(1); }
+  .rate a:hover { border-color: var(--brass-dim); filter: none; }
+  .rate a.on { border-color: var(--brass); filter: none; background: rgba(201,162,74,.12); }
+  /* Карточка вызова инструмента: JSON запроса виден, пока идёт запрос; после ответа сворачивается */
+  details.tool { align-self: stretch; max-width: 100%; border: 1px solid var(--line); border-left: 2px solid var(--brass-dim);
+    background: rgba(255,255,255,.015); padding: 6px 12px; animation: in .18s ease-out; }
+  details.tool > summary { cursor: pointer; list-style: none; font: 11px/1.4 "JetBrains Mono", monospace; color: var(--muted);
+    display: flex; gap: 8px; align-items: center; }
+  details.tool > summary::-webkit-details-marker { display: none; }
+  details.tool > summary .nm { color: var(--brass); }
+  details.tool > summary .st { margin-left: auto; letter-spacing: .1em; }
+  details.tool.run > summary .st::after { content: ""; display: inline-block; width: 7px; height: 7px; margin-left: 6px;
+    border-radius: 50%; background: var(--brass); animation: blink .8s infinite; }
+  details.tool.ok { border-left-color: #3fbf6f; } details.tool.ok > summary .st { color: #3fbf6f; }
+  details.tool.err { border-left-color: var(--red); } details.tool.err > summary .st { color: var(--red); }
+  details.tool pre { margin: 6px 0 2px; max-height: 260px; overflow: auto; font-size: 11.5px; }
+  details.tool .lbl { font: 10px "Oswald", sans-serif; letter-spacing: .2em; color: var(--muted); margin-top: 6px; }
+  @keyframes blink { 50% { opacity: .2; } }
+  /* Файл на загрузку */
+  .fcard { align-self: flex-start; display: flex; gap: 14px; align-items: center; border: 1px solid var(--brass-dim);
+    background: linear-gradient(90deg, rgba(201,162,74,.08), transparent); padding: 10px 14px; max-width: 88%;
+    animation: in .18s ease-out; }
+  .fcard .ic { font: 13px "Russo One", sans-serif; color: #0e0b0a; background: var(--brass); padding: 10px 8px;
+    min-width: 46px; text-align: center; letter-spacing: .05em; }
+  .fcard .nm { color: #fff3dc; font-weight: 600; word-break: break-all; }
+  .fcard .meta { color: var(--muted); font-size: 12px; margin-top: 2px; word-break: break-all; }
+  .fcard .acts { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+  .fcard a { text-decoration: none; font: 11px "Oswald", sans-serif; letter-spacing: .18em; padding: 5px 12px;
+    border: 1px solid var(--line); color: var(--cream); }
+  .fcard a:hover { border-color: var(--brass); color: #fff3dc; }
+  .fcard a.main { background: var(--red); border-color: var(--red); color: #fff; }
+  .fcard img.pv { width: 132px; height: 132px; background: #fff; padding: 4px; image-rendering: pixelated; }
+</style>
+</head>
+<body>
+<div id="log">
+  <div class="empty" id="empty">
+    <div class="big">ХРАЗ</div>
+    <div class="sub">Хранитель знаний · канал связи открыт</div>
+    <div class="hint">Скажите «ХРАЗ…» или напишите ниже. «Что ты умеешь» — полный перечень.</div>
+  </div>
+</div>
+<script>
+const KH = (() => {
+  const log = document.getElementById("log");
+  let live = null, liveText = "", pending = false;
+
+  // Формулы прячем от markdown (иначе съест _ и \), рендерим KaTeX и возвращаем на место.
+  function render(md) {
+    const math = [];
+    const keep = (tex, display) => { math.push([tex, display]); return `@@M${math.length - 1}@@`; };
+    let src = md
+      .replace(/\$\$([\s\S]+?)\$\$/g, (_, t) => keep(t, true))
+      .replace(/\\\[([\s\S]+?)\\\]/g, (_, t) => keep(t, true))
+      .replace(/\\\(([\s\S]+?)\\\)/g, (_, t) => keep(t, false))
+      .replace(/(^|[^\\$])\$([^$\n]+?)\$/g, (_, pre, t) => pre + keep(t, false));
+    let html = marked.parse(src, { breaks: true, gfm: true });
+    html = sanitize(html);
+    html = html.replace(/@@M(\d+)@@/g, (_, i) => {
+      const [tex, display] = math[+i];
+      try { return katex.renderToString(tex, { displayMode: display, throwOnError: false, strict: false }); }
+      catch (e) { return `<code>${tex}</code>`; }
+    });
+    return html;
+  }
+
+  // Безопасность: сырой HTML из ответа модели/инструментов не исполняется, ссылки — только http(s).
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  marked.use({ renderer: { html(h) { return esc(typeof h === "string" ? h : (h.raw || h.text || "")); } } });
+  function sanitize(html) {
+    const t = document.createElement("template");
+    t.innerHTML = html;
+    t.content.querySelectorAll("script,iframe,object,embed,style,link,meta,form").forEach(n => n.remove());
+    t.content.querySelectorAll("*").forEach(n => {
+      [...n.attributes].forEach(a => { if (/^on/i.test(a.name)) n.removeAttribute(a.name); });
+    });
+    t.content.querySelectorAll("a").forEach(a => {
+      if (!/^https?:\/\//i.test(a.getAttribute("href") || "")) a.removeAttribute("href");
+    });
+    t.content.querySelectorAll("img").forEach(i => i.remove());
+    return t.innerHTML;
+  }
+
+  function addCopy(el) {
+    el.querySelectorAll("pre").forEach(pre => {
+      if (pre.querySelector(".copy")) return;
+      const b = document.createElement("button");
+      b.className = "copy"; b.textContent = "КОПИРОВАТЬ";
+      b.onclick = () => { navigator.clipboard.writeText(pre.innerText.replace(/КОПИРОВАТЬ$/, "")); b.textContent = "СКОПИРОВАНО"; };
+      pre.appendChild(b);
+    });
+  }
+
+  function bubble(role, meta, ts) {
+    document.getElementById("empty")?.remove();
+    document.querySelectorAll(".more").forEach(n => n.remove());     // «Подробнее» — только у последнего ответа
+    const d = document.createElement("div");
+    d.className = "msg " + role;
+    const t = ts || new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+    const name = role === "user" ? "Майор" : "ХРАЗ";
+    d.innerHTML = `<div class="who"><span>${name}</span><time>${esc(t)}</time><em class="meta"></em></div><div class="body"></div>`;
+    if (meta && role === "bot") d.querySelector(".meta").textContent = meta;
+    log.appendChild(d);
+    return d.querySelector(".body");
+  }
+
+  const scroll = () => window.scrollTo(0, document.body.scrollHeight);
+
+  return {
+    add(role, md, meta, ts) {
+      const b = bubble(role, meta, ts);
+      b.innerHTML = render(md);
+      addCopy(b); scroll();
+    },
+    start(meta) { live = bubble("bot", meta); liveText = ""; live.classList.add("cursor"); scroll(); },
+    // Ссылка «Подробнее» под кратким ответом: khraz://continue — перехватывает приложение
+    more() {
+      const bots = log.querySelectorAll(".msg.bot");
+      const last = bots[bots.length - 1];
+      if (!last || last.querySelector(".more")) return;
+      const a = document.createElement("a");
+      a.className = "more"; a.href = "khraz://continue/1"; a.textContent = "ПОДРОБНЕЕ ›";
+      last.appendChild(a); scroll();
+    },
+    token(t) {
+      if (!live) this.start();
+      liveText += t;
+      if (pending) return;
+      pending = true;
+      setTimeout(() => { pending = false; if (live) { live.innerHTML = render(liveText); live.classList.add("cursor"); scroll(); } }, 90);
+    },
+    end(md) {
+      if (!live) return;
+      if (md) liveText = md;
+      if (!liveText.trim()) { live.closest(".msg").remove(); }
+      else { live.innerHTML = render(liveText); live.classList.remove("cursor"); addCopy(live); }
+      live = null; scroll();
+    },
+    clear() { log.innerHTML = ""; },
+    alert(md) {
+      document.getElementById("empty")?.remove();
+      const d = document.createElement("div");
+      d.className = "msg alert";
+      const t = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+      d.innerHTML = `<div class="who"><span>ХРАЗ · сам</span><time>${t}</time></div><div class="body"></div>`;
+      d.querySelector(".body").innerHTML = render(md);
+      log.appendChild(d); scroll();
+    },
+    // 👍/👎 под последним ответом (или под ответом с этим id после перезагрузки чата)
+    rateable(id, vote) {
+      const bots = log.querySelectorAll(".msg.bot");
+      const last = bots[bots.length - 1];
+      if (!last || last.querySelector(".rate")) return;
+      const r = document.createElement("div");
+      r.className = "rate"; r.id = "rate-" + id;
+      r.innerHTML = `<a href="khraz://rate/up/${id}" title="Удачный ответ — брать за образец">👍</a>
+                     <a href="khraz://rate/down/${id}" title="Неудачный — так не отвечать">👎</a>`;
+      last.appendChild(r);
+      this.rated(id, vote);
+    },
+    rated(id, vote) {
+      const r = document.getElementById("rate-" + id);
+      if (!r) return;
+      const [up, down] = r.querySelectorAll("a");
+      up.classList.toggle("on", vote > 0); down.classList.toggle("on", vote < 0);
+      r.classList.toggle("voted", vote !== 0);
+    },
+    toolStart(id, name, args) {
+      document.getElementById("empty")?.remove();
+      const d = document.createElement("details");
+      d.className = "tool run"; d.id = "tool-" + id; d.open = true; d.dataset.t0 = Date.now();
+      d.innerHTML = `<summary>⚙ <span class="nm"></span><span class="st">ЗАПРОС</span></summary>
+        <div class="lbl">ЗАПРОС</div><pre class="rq"></pre>`;
+      d.querySelector(".nm").textContent = name;
+      d.querySelector(".rq").textContent = args;
+      log.appendChild(d); scroll();
+    },
+    toolEnd(id, ok, result) {
+      const d = document.getElementById("tool-" + id);
+      if (!d) return;
+      const sec = ((Date.now() - +d.dataset.t0) / 1000).toFixed(1);
+      d.classList.remove("run"); d.classList.add(ok ? "ok" : "err");
+      d.querySelector(".st").textContent = (ok ? "ГОТОВО" : "ОШИБКА") + " · " + sec + " с";
+      const lbl = document.createElement("div"); lbl.className = "lbl"; lbl.textContent = ok ? "ОТВЕТ" : "ПРИЧИНА";
+      const pre = document.createElement("pre"); pre.textContent = result;
+      d.appendChild(lbl); d.appendChild(pre); addCopy(d); scroll();
+      if (ok) setTimeout(() => { d.open = false; }, 1400);      // успешный запрос сворачивается
+    },
+    // Файл, созданный ХРАЗом: кнопки ведут на khraz://file/<действие>/<id>, их перехватывает приложение
+    file(id, name, size, folder, preview) {
+      document.getElementById("empty")?.remove();
+      const ext = (name.split(".").pop() || "").toUpperCase().slice(0, 4);
+      const d = document.createElement("div");
+      d.className = "fcard";
+      d.innerHTML = `<div class="ic"></div><div><div class="nm"></div><div class="meta"></div><div class="acts">
+        <a class="main" href="khraz://file/open/${id}">ОТКРЫТЬ</a>
+        <a href="khraz://file/save/${id}">СОХРАНИТЬ КАК…</a>
+        <a href="khraz://file/folder/${id}">В ПАПКЕ</a></div></div>`;
+      d.querySelector(".ic").textContent = ext;
+      if (preview && /^(file:\/\/|\/files\/)/.test(preview)) {           // картинку (QR-код) показываем сразу
+        const img = document.createElement("img");
+        img.className = "pv"; img.src = preview; img.alt = name;
+        d.querySelector(".ic").replaceWith(img);
+      }
+      d.querySelector(".nm").textContent = name;
+      d.querySelector(".meta").textContent = size + " · " + folder;
+      log.appendChild(d); scroll();
+    },
+    // Карточка подтверждения: кнопки ведут на khraz://approve|reject/<id>, их перехватывает приложение.
+    confirm(id, title, md, voiceOk) {
+      document.getElementById("empty")?.remove();
+      const d = document.createElement("div");
+      d.className = "msg card"; d.id = "op-" + id;
+      d.innerHTML = `<h4></h4><div class="body"></div><div class="acts">
+        <a class="btn ok" href="khraz://approve/${id}">ПОДТВЕРДИТЬ</a>
+        <a class="btn" href="khraz://reject/${id}">ОТКЛОНИТЬ</a>
+        <span class="note"></span></div>`;
+      d.querySelector("h4").textContent = title;
+      d.querySelector(".body").innerHTML = render(md);
+      d.querySelector(".note").textContent = voiceOk ? "или скажите «да» / «нет»" : "только кнопкой — голос не принимается";
+      addCopy(d); log.appendChild(d); scroll();
+    },
+    resolve(id, text) {
+      const d = document.getElementById("op-" + id);
+      if (!d) return;
+      d.classList.add("done");
+      d.querySelector(".acts").innerHTML = `<span class="state"></span>`;
+      d.querySelector(".state").textContent = text;
+    },
+  };
+})();
+window.KH = KH;
+</script>
+</body>
+</html>

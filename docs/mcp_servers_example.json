@@ -1,0 +1,26 @@
+{
+  "_readme": "Импорт: ХРАЗ → Коннекторы → MCP-серверы → «Импорт из Claude Desktop…» → этот файл. Сначала замените пути и токены (или удалите токены здесь и задайте их кнопкой «Секреты…»). Лишние серверы удалите: локальной модели 9b удобнее, когда инструментов немного.",
+  "mcpServers": {
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": { "Authorization": "Bearer ВСТАВЬТЕ_GITHUB_TOKEN" }
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "fetch": {
+      "command": "uvx",
+      "args": ["mcp-server-fetch"]
+    },
+    "git": {
+      "command": "uvx",
+      "args": ["mcp-server-git", "--repository", "C:/Projects/myproject"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["-y", "@playwright/mcp@latest"]
+    }
+  }
+}

@@ -1,0 +1,236 @@
+[
+  {
+    "say": "открой калькулятор",
+    "tool": "open_app",
+    "args": {
+      "name": "калькулятор"
+    }
+  },
+  {
+    "say": "запусти майнкрафт",
+    "tool": "open_app",
+    "args": {
+      "name": "minecraft"
+    }
+  },
+  {
+    "say": "включи атомик харт",
+    "tool": "open_app",
+    "args": {
+      "name": "atomic heart"
+    }
+  },
+  {
+    "say": "закрой дискорд",
+    "tool": "close_app",
+    "args": {
+      "name": "discord"
+    }
+  },
+  {
+    "say": "сделай погромче",
+    "tool": "pc_action",
+    "args": {
+      "action": "volume_up"
+    }
+  },
+  {
+    "say": "выключи звук",
+    "tool": "pc_action",
+    "args": {
+      "action": "mute"
+    }
+  },
+  {
+    "say": "найди на ютубе лекции по теории вероятностей",
+    "tool": "pc_action",
+    "args": {
+      "action": "youtube_search"
+    }
+  },
+  {
+    "say": "сделай скриншот",
+    "tool": "pc_action",
+    "args": {
+      "action": "screenshot"
+    }
+  },
+  {
+    "say": "сверни все окна",
+    "tool": "pc_action",
+    "args": {
+      "action": "minimize_all"
+    }
+  },
+  {
+    "say": "сколько места на дисках",
+    "tool": "run_command",
+    "args": {
+      "name": "disk_space"
+    }
+  },
+  {
+    "say": "какой у меня ip",
+    "tool": "run_command",
+    "args": {
+      "name": "ip_address"
+    }
+  },
+  {
+    "say": "что грузит процессор",
+    "tool": "run_command",
+    "args": {
+      "name": "top_processes"
+    }
+  },
+  {
+    "say": "поставь таймер на 10 минут",
+    "tool": "set_timer",
+    "args": {
+      "seconds": 600
+    }
+  },
+  {
+    "say": "напомни через 30 минут позвонить маме",
+    "tool": "set_reminder",
+    "args": {
+      "in_minutes": 30
+    }
+  },
+  {
+    "say": "создай заметку: купить кабель hdmi",
+    "tool": "create_note",
+    "args": {
+      "text": "hdmi"
+    }
+  },
+  {
+    "say": "найди файл договор с ивановым",
+    "tool": "find_file",
+    "args": {
+      "query": "договор"
+    }
+  },
+  {
+    "say": "сделай таблицу учеников в excel",
+    "tool": "create_file",
+    "args": {
+      "format": "xlsx"
+    }
+  },
+  {
+    "say": "что я просил тебя запомнить про сервер",
+    "tool": "memory_search",
+    "args": {}
+  },
+  {
+    "say": "запомни, что я не пью кофе после шести",
+    "tool": "memory_save",
+    "args": {
+      "text": "кофе"
+    }
+  },
+  {
+    "say": "что в моих конспектах про производную",
+    "tool": "kb_search",
+    "args": {
+      "query": "производн"
+    }
+  },
+  {
+    "say": "привет, как дела",
+    "tool": "None",
+    "args": {}
+  },
+  {
+    "say": "объясни, что такое производная",
+    "tool": "None",
+    "args": {}
+  },
+  {
+    "say": "расскажи анекдот",
+    "tool": "None",
+    "args": {}
+  },
+  {
+    "say": "как работает reality в vless",
+    "tool": "None",
+    "args": {}
+  },
+  {
+    "say": "поищи в интернете курс доллара",
+    "tool": "web_search",
+    "args": {}
+  },
+  {
+    "say": "что такое vpn",
+    "tool": "None",
+    "args": {}
+  },
+  {
+    "say": "каждое воскресенье в 20:00 присылай сводку по клиентам",
+    "tool": "rule_add",
+    "args": {
+      "schedule": "weekly sun"
+    }
+  },
+  {
+    "say": "какие у меня правила по расписанию",
+    "tool": "rule_list",
+    "args": {}
+  },
+  {
+    "say": "покажи последние ошибки в логе app",
+    "tool": "read_log",
+    "args": {
+      "source": "app",
+      "grep": "error"
+    }
+  },
+  {
+    "say": "отмени последнее изменение",
+    "tool": "undo_last",
+    "args": {}
+  },
+  {
+    "say": "покажи статистику инструментов",
+    "tool": "tool_stats",
+    "args": {}
+  },
+  {
+    "say": "разбуди ноутбук",
+    "tool": "wake_laptop",
+    "args": {}
+  },
+  {
+    "say": "нарисуй график: январь 10, февраль 15, март 12",
+    "tool": "show_chart",
+    "args": {
+      "labels": "январь"
+    }
+  },
+  {
+    "say": "построй таблицу: ivan 30 дней, olga 10 дней",
+    "tool": "show_table",
+    "args": {}
+  },
+  {
+    "say": "что это за панель и как в неё зайти",
+    "tool": "khraz_info",
+    "args": {}
+  },
+  {
+    "say": "спроси клода почему падает деплой",
+    "tool": "ask_coder",
+    "args": {
+      "task": "деплой"
+    }
+  },
+  {
+    "say": "переключи кодера на кодекс",
+    "tool": "coder_set",
+    "args": {
+      "agent": "codex"
+    }
+  }
+]

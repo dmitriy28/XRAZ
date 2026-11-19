@@ -1,0 +1,5 @@
+# Чтобы GitHub считал языком проекта Python, а не вложенные библиотеки
+assets/web/katex/** linguist-vendored
+assets/web/marked.min.js linguist-vendored
+assets/fonts/** linguist-vendored
+*.bat text eol=crlf

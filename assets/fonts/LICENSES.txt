@@ -1,0 +1,5 @@
+Russo One — SIL Open Font License 1.1 (см. OFL-RussoOne.txt)
+Oswald — SIL Open Font License 1.1, The Oswald Project Authors
+JetBrains Mono — SIL Open Font License 1.1, The JetBrains Mono Project Authors
+KaTeX — MIT License; marked — MIT License
+Фирменный шрифт Atomic Heart не используется (он не распространяется свободно).
